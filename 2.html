@@ -1,0 +1,84 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ADMIN PAGE</title>
+        <link rel="stylesheet" href="style.css?v=2">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="icon" href="logo.png" type="image/png">
+    </head>
+    <body>
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <div class="upbox">
+       &nbsp;&nbsp;&nbsp;&nbsp;<div class="hh"> <img src="logo.png" width="70px" alt="Logo"></div>
+       
+       
+      <span class="brand-name">AMR SAKR</span>
+      <div class="upboxs">
+        <button id="menuBtn" class="menu-btn" type="button" aria-label="Open menu">
+          <img src="menu.png" width="60px" alt="Menu">
+        </button>
+      </div>
+    </div>
+
+    <aside id="sideMenu" class="side-menu" aria-label="Main menu">
+      <button id="closeMenu" class="close-menu" type="button" aria-label="Close menu">×</button>
+      <h2>AMR SAKR</h2>
+      <a href="2.html">UPLOAD</a>
+      <a href="student.html">MANAGE STUDENTS</a>
+     
+    </aside>
+    <main class="hero-wrap">
+      <section class="hero-card hero-split">
+        <article class="hero-visual">
+          <p class="eyebrow">unlock the wonders of science</p>
+          <img src="logo.png" width="350px" id="mlogo" alt="AMR SAKR logo">
+          <h1 class="hero-title">AMR SAKR</h1>
+          <p class="hero-text">THE ADMIN WEB<br></p>
+        </article>
+
+        <aside class="hero-actions">
+          <div class="btn-group">
+            <a href="upload.html"><button class="btn">UPLOAD CONTENT TO MIDDLE 1</button></a>
+            <a href="upload2.html"><button class="btn">UPLOAD CONTENT TO MIDDLE 2</button></a>
+            <a href="upload3.html"><button class="btn">UPLOAD CONTENT TO MIDDLE 3</button></a>
+            
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script>
+      const menuBtn = document.getElementById('menuBtn');
+      const sideMenu = document.getElementById('sideMenu');
+      const overlay = document.getElementById('menuOverlay');
+      const closeMenu = document.getElementById('closeMenu');
+
+      function openMenu() {
+        sideMenu.classList.add('open');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMenuPanel() {
+        sideMenu.classList.remove('open');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+
+      menuBtn.addEventListener('click', openMenu);
+      closeMenu.addEventListener('click', closeMenuPanel);
+      overlay.addEventListener('click', closeMenuPanel);
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closeMenuPanel();
+        }
+      });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMR SAKR | Homework Management</title>
+  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png" type="image/png">
+
+  <style>
+    body {
+      padding-top: 82px;
+    }
+
+    .hero-wrap {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+    }
+
+    .student-box {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .error-card {
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.25);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      color: #ff8d8d;
+    }
+
+    .form-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      margin-top: 10px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .form-group label {
+      color: #ffd700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      color: #fff;
+      font-family: 'Share Tech', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #ffd700;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .toolbar-btn {
+      align-self: flex-start;
+      background: rgba(255, 215, 0, 0.12);
+      border: 1px solid rgba(255, 215, 0, 0.35);
+      color: #ffd700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Share Tech', sans-serif;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    .toolbar-btn:hover {
+      background: rgba(255, 215, 0, 0.25);
+      border-color: #ffd700;
+    }
+
+    .hw-card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      position: relative;
+      text-align: left;
+    }
+
+    .hw-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+      padding-bottom: 8px;
+    }
+
+    .hw-title {
+      margin: 0;
+      font-size: 18px;
+      color: #ffd700;
+      letter-spacing: 0.5px;
+    }
+
+    .hw-tag {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      background: rgba(255, 215, 0, 0.15);
+      color: #ffd700;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .lesson-text {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .hw-content-text {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.85);
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .bullet-styled {
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 16px;
+      margin-right: 4px;
+    }
+
+    .delete-btn {
+      background: rgba(255, 61, 0, 0.2);
+      color: #ff3d00;
+      border: 1px solid rgba(255, 61, 0, 0.4);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Share Tech', sans-serif;
+      font-size: 13px;
+      align-self: flex-end;
+      transition: background 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: rgba(255, 61, 0, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .hw-card {
+        text-align: center;
+        align-items: center;
+      }
+      .hw-header {
+        flex-direction: column;
+        gap: 6px;
+      }
+      .delete-btn {
+        align-self: center;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const theme = localStorage.getItem('settings-theme') || 'dark';
+      const accent = localStorage.getItem('settings-accent') || 'gold';
+      const fontSize = localStorage.getItem('settings-fontSize') || 'normal';
+      const sidebarSide = localStorage.getItem('settings-sidebarSide') || 'right';
+      const animations = localStorage.getItem('settings-animations') || 'normal';
+      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.setAttribute('data-accent', accent);
+      document.documentElement.setAttribute('data-font-size', fontSize);
+      document.documentElement.setAttribute('data-sidebar-side', sidebarSide);
+      document.documentElement.setAttribute('data-animations', animations);
+    })();
+  </script>
+  <script src="settings.js" defer></script>
+</head>
+<body>
+
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+  <div class="upbox">
+    &nbsp;&nbsp;&nbsp;&nbsp;<div class="hh"> <img src="logo.png" width="70px" alt="Logo"></div>
+    <span class="brand-name">AMR SAKR</span>
+    <div class="upboxs">
+      <button id="menuBtn" class="menu-btn" type="button" aria-label="Open menu">
+        <img src="menu.png" width="60px" alt="Menu">
+      </button>
+    </div>
+  </div>
+
+  <aside id="sideMenu" class="side-menu" aria-label="Main menu">
+    <button id="closeMenu" class="close-menu" type="button" aria-label="Close menu">×</button>
+    <h2>AMR SAKR</h2>
+    <a href="code.html">SIGN IN</a>
+    <a href="contact.html">CONTACT</a>
+    <a href="designer.html">THE WEB DESIGNER</a>
+  </aside>
+
+  <main class="hero-wrap">
+    <section class="hero-card hero-split">
+      <article class="hero-visual">
+        <p class="eyebrow">ADMIN CONTROL PANEL</p>
+        <img src="logo.png" width="300px" id="mlogo" alt="AMR SAKR logo">
+        <h1 class="hero-title">Published Homework</h1>
+        <p class="hero-text">Manage all created assignments below</p>
+        <br><br>
+
+        <div id="adminHwList" class="student-box"></div>
+      </article>
+
+      <aside class="hero-actions">
+        <div class="btn-group" style="width: 100%;">
+          <form id="hwForm" class="form-card">
+            <h3 style="color:#ffd700; margin:0; font-size:18px;">ADD NEW HOMEWORK</h3>
+            
+            <div class="form-group">
+              <label for="hwGrade">Select Grade</label>
+              <select id="hwGrade" class="form-select" required>
+                <option value="1">Middle 1</option>
+                <option value="2">Middle 2</option>
+                <option value="3">Middle 3</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="hwGroup">Target Group</label>
+              <select id="hwGroup" class="form-select">
+                <option value="">All groups / same grade</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="hwNumber">Homework Number</label>
+              <input type="number" id="hwNumber" class="form-input" placeholder="e.g. 1" required>
+            </div>
+
+            <div class="form-group">
+              <label for="lessonTitle">Lesson Title</label>
+              <input type="text" id="lessonTitle" class="form-input" placeholder="e.g. Chemical Reactions" required>
+            </div>
+
+            <div class="form-group">
+              <label for="hwContent">Assignment Details</label>
+              <button type="button" id="addBulletBtn" class="toolbar-btn">+ Add Separator</button>
+              <textarea id="hwContent" class="form-textarea" placeholder="Enter assignment details..." required></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn" style="width: 100%; margin-top: 5px;">PUBLISH HOMEWORK</button>
+          </form>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    const closeMenu = document.getElementById('closeMenu');
+
+    function openMenu() {
+      sideMenu.classList.add('open');
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenuPanel() {
+      sideMenu.classList.remove('open');
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    menuBtn.addEventListener('click', openMenu);
+    closeMenu.addEventListener('click', closeMenuPanel);
+    overlay.addEventListener('click', closeMenuPanel);
+
+    const hwContent = document.getElementById('hwContent');
+    const addBulletBtn = document.getElementById('addBulletBtn');
+
+    addBulletBtn.addEventListener('click', () => {
+      const separator = "● ";
+      const start = hwContent.selectionStart;
+      const end = hwContent.selectionEnd;
+      const text = hwContent.value;
+      
+      hwContent.value = text.substring(0, start) + separator + text.substring(end);
+      hwContent.focus();
+      hwContent.selectionStart = hwContent.selectionEnd = start + separator.length;
+    });
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCEFLxdWt8h1_JWjzyJ2n2dP-HXxmD3jvU",
+      authDomain: "signup-27311.firebaseapp.com",
+      projectId: "signup-27311",
+      storageBucket: "signup-27311.firebasestorage.app",
+      messagingSenderId: "486600508939",
+      appId: "1:486600508939:web:6802cff99cb9244218a90e"
+    };
+
+    const studentFirebaseConfig = {
+      apiKey: "AIzaSyCEFLxdWt8h1_JWjzyJ2n2dP-HXxmD3jvU",
+      authDomain: "students-68430.firebaseapp.com",
+      projectId: "students-68430",
+      storageBucket: "students-68430.firebasestorage.app",
+      messagingSenderId: "202641775624",
+      appId: "1:202641775624:web:fe2d70e4ec92d62d5b85bd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsApp = initializeApp(studentFirebaseConfig, "students-shared");
+    const dbStudents = getFirestore(studentsApp);
+
+    const hwForm = document.getElementById('hwForm');
+    const adminHwList = document.getElementById('adminHwList');
+    const hwGroup = document.getElementById('hwGroup');
+
+    async function loadGroups() {
+      const snapshot = await getDocs(collection(dbStudents, "groups"));
+      const groups = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.active !== false) {
+          groups.push({ id: docSnap.id, name: data.name || 'Unnamed Group' });
+        }
+      });
+      groups.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (hwGroup) {
+        hwGroup.innerHTML = '<option value="">All groups / same grade</option>';
+        groups.forEach((group) => {
+          const option = document.createElement('option');
+          option.value = group.id;
+          option.textContent = group.name;
+          hwGroup.appendChild(option);
+        });
+      }
+    }
+
+    async function loadAllHomeworks() {
+      try {
+        const snapshot = await getDocs(collection(db, "homeworks"));
+        
+        // تعديل: جلب المجموعات من dbStudents بدلاً من db
+        const groupsSnapshot = await getDocs(collection(dbStudents, "groups"));
+        const groupsById = {};
+        groupsSnapshot.forEach((groupDoc) => {
+          const data = groupDoc.data();
+          groupsById[groupDoc.id] = data.name || 'Unnamed Group';
+        });
+
+        const homeworks = snapshot.docs
+          .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
+          .sort((a, b) => Number(b.hwNumber || 0) - Number(a.hwNumber || 0));
+
+        adminHwList.innerHTML = "";
+
+        if (!homeworks.length) {
+          adminHwList.innerHTML = "<div class='error-card' style='background:rgba(255,255,255,0.05); color:#fff; border-color:rgba(255,255,255,0.1)'><strong>No homework uploaded yet.</strong></div>";
+          return;
+        }
+
+        homeworks.forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "hw-card";
+
+          const formattedContent = (item.content || "")
+            .replace(/●/g, '<span class="bullet-styled">●</span>')
+            .replace(/•/g, '<span class="bullet-styled">●</span>');
+
+          // قراءة اسم الجروب بشكل صحيح من الخريطة
+          const groupName = item.group && groupsById[item.group] ? groupsById[item.group] : 'All groups';
+
+          card.innerHTML = `
+            <div class="hw-header">
+              <h4 class="hw-title">Homework #${item.hwNumber || '-'}</h4>
+              <span class="hw-tag">Middle ${item.grade || '1'} • ${groupName}</span>
+            </div>
+            <div class="lesson-text">Lesson: ${item.lessonTitle || '-'}</div>
+            <div class="hw-content-text">${formattedContent}</div>
+            <button class="delete-btn" data-id="${item.id}">DELETE HOMEWORK</button>
+          `;
+          
+          adminHwList.appendChild(card);
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            if (confirm("Are you sure you want to delete this homework?")) {
+              await deleteDoc(doc(db, "homeworks", id));
+              loadAllHomeworks();
+            }
+          });
+        });
+
+      } catch (err) {
+        console.error("Error loading homeworks:", err);
+      }
+    }
+
+    hwForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const grade = document.getElementById('hwGrade').value;
+      const selectedGroup = document.getElementById('hwGroup').value || '';
+      const number = parseInt(document.getElementById('hwNumber').value);
+      const title = document.getElementById('lessonTitle').value.trim();
+      const content = document.getElementById('hwContent').value.trim();
+
+      try {
+        await addDoc(collection(db, "homeworks"), {
+          grade: grade,
+          group: selectedGroup,
+          hwNumber: number,
+          lessonTitle: title,
+          content: content,
+          createdAt: new Date().toISOString()
+        });
+
+        hwForm.reset();
+        loadAllHomeworks();
+      } catch (err) {
+        console.error("Error publishing homework: ", err);
+      }
+    });
+
+    await loadGroups();
+    loadAllHomeworks();
+  </script>
+</body>
+</html>

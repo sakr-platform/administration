@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMR SAKR | Approve Requests</title>
+  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png" type="image/png">
+  <style>
+    .admin-shell {
+      width: min(100%, 1180px);
+      margin: 0 auto;
+      padding: 18px 14px 40px;
+      box-sizing: border-box;
+    }
+
+    .admin-card {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .admin-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .admin-box {
+      background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.10);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .admin-box h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      color: #fff;
+    }
+
+    .admin-box p {
+      margin: 0 0 8px;
+      color: rgba(255,255,255,0.82);
+      font-size: 14px;
+    }
+
+    .admin-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .student-card {
+      position: relative;
+      background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    .student-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .student-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ffe675;
+      background: rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+
+    .student-card h3 {
+      margin: 0;
+      font-size: 22px;
+      color: #fff;
+      text-align: center;
+      width: 100%;
+    }
+
+    .student-card p {
+      margin: 6px 0;
+      color: rgba(255,255,255,0.88);
+      font-size: 14px;
+    }
+
+    .student-id {
+      color: #ffe675;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .parent-id {
+      color: #a3e5ff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .admin-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .admin-btn-row .btn {
+      min-height: 48px;
+      font-size: 18px;
+      border-radius: 14px;
+      max-width: none;
+      flex: 1 1 140px;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: linear-gradient(145deg, rgba(30, 35, 45, 0.95), rgba(15, 18, 25, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transform: translateY(12px);
+      transition: transform 0.25s ease;
+      color: #fff;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #ffe675;
+    }
+
+    .modal-subtext {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 18px;
+    }
+
+    .modal-select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 15px;
+      margin-bottom: 20px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .modal-select option {
+      background: #181b22;
+      color: #fff;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .modal-actions button:hover {
+      opacity: 0.9;
+    }
+
+    @media (min-width: 851px) {
+      .admin-card {
+        flex-direction: row;
+        align-items: stretch;
+      }
+      .admin-card > .hero-visual { flex: 1; }
+      .admin-card > .hero-actions { flex: 1.1; align-items: stretch; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+  <div class="upbox">
+    &nbsp;&nbsp;&nbsp;&nbsp;<div class="hh"><img src="logo.png" width="70px" alt="Logo"></div>
+    <span class="brand-name">AMR SAKR</span>
+  </div>
+
+  <main class="hero-wrap admin-shell">
+    <section class="hero-card admin-card">
+      <article class="hero-visual">
+        <p class="eyebrow">ADMIN APPROVAL</p>
+        <img src="logo.png" width="350px" id="mlogo" alt="AMR SAKR logo">
+        <h1 class="hero-title">AMR SAKR</h1>
+        <p class="hero-text">Review and approve students</p>
+      </article>
+
+      <aside class="hero-actions">
+        <div class="admin-panel">
+          <div class="admin-box">
+            <h2>Pending Applications</h2>
+            <p>Students waiting for account activation.</p>
+          </div>
+
+          <div id="pendingStudents" class="admin-grid"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Group Assignment Modal Popup -->
+  <div id="approveModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">Approve Student</div>
+      <p class="modal-subtext">Select a group for <strong id="modalStudentName" style="color: #a3e5ff;"></strong> before approval:</p>
+      
+      <label style="display:block; font-size:12px; margin-bottom:6px; color:#aaa;">ASSIGN GROUP</label>
+      <select id="modalGroupSelect" class="modal-select">
+        <option value="">No group</option>
+      </select>
+
+      <div class="modal-actions">
+        <button id="confirmApproveBtn" style="background:#4edf7a; color:#000;">Confirm & Approve</button>
+        <button id="cancelModalBtn" style="background:rgba(255,255,255,0.15); color:#fff;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAC1bNuWAD8noagHV2SD0y4PP0ABhxDdqo",
+  authDomain: "students-68430.firebaseapp.com",
+  projectId: "students-68430",
+  storageBucket: "students-68430.firebasestorage.app",
+  messagingSenderId: "202641775624",
+  appId: "1:202641775624:web:fe2d70e4ec92d62d5b85bd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffe675'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-3.8-.85-5.05-2.2.03-1.68 3.37-2.6 5.05-2.6s5.02.92 5.05 2.6C15.8 19.15 14.03 20 12 20z'/></svg>";
+
+let currentStudentId = null;
+let cachedGroups = [];
+
+async function getActiveGroups() {
+  const snapshot = await getDocs(collection(db, "groups"));
+  const groups = [];
+  snapshot.forEach((groupDoc) => {
+    const data = groupDoc.data();
+    if (data.active !== false) {
+      groups.push({ id: groupDoc.id, name: data.name || "Unnamed Group" });
+    }
+  });
+  groups.sort((a, b) => a.name.localeCompare(b.name));
+  return groups;
+}
+
+async function loadPendingStudents() {
+  const container = document.getElementById("pendingStudents");
+  container.innerHTML = "";
+
+  cachedGroups = await getActiveGroups();
+  const querySnapshot = await getDocs(collection(db, "students"));
+  let count = 0;
+
+  for (const studentDoc of querySnapshot.docs) {
+    const data = studentDoc.data();
+
+    if (data.approved === false || data.approved === undefined) {
+      count++;
+      const studentPic = data.profilePic ? data.profilePic : defaultAvatar;
+      const card = document.createElement("div");
+      card.className = "student-card";
+
+      card.innerHTML = `
+        <div class="student-header">
+          <img src="${studentPic}" class="student-avatar" alt="Profile">
+          <h3>${escapeHtml(data.name)}</h3>
+        </div>
+
+        <p><span class="student-id">Student ID: ${data.id}</span></p>
+        <p><span class="parent-id">Parent ID: ${data.parentId}</span></p>
+        <p>Student Phone: ${data.studentPhone || "N/A"}</p>
+        <p>Parent Phone: ${data.phone}</p>
+        <p>Middle: ${data.middle}</p>
+
+        <div class="admin-btn-row" style="margin-top: 14px;">
+          <button class="btn" style="background:#4edf7a; color:#000;" onclick="openApproveModal('${data.id}', '${escapeHtml(data.name)}')">Approve</button>
+          <button class="btn" style="background:rgba(255,0,0,0.2); color:#fff;" onclick="disapproveStudent('${data.id}')">Disapprove</button>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+  }
+
+  if (count === 0) {
+    container.innerHTML = `<div class="admin-box"><p style="text-align:center;">No pending applications found.</p></div>`;
+  }
+}
+
+// Modal Logic
+window.openApproveModal = function(id, name) {
+  currentStudentId = id;
+  document.getElementById("modalStudentName").innerText = name;
+  
+  const selectEl = document.getElementById("modalGroupSelect");
+  selectEl.innerHTML = `<option value="">No group</option>` + 
+    cachedGroups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join("");
+
+  document.getElementById("approveModal").classList.add("active");
+};
+
+function closeModal() {
+  document.getElementById("approveModal").classList.remove("active");
+  currentStudentId = null;
+}
+
+document.getElementById("cancelModalBtn").addEventListener("click", closeModal);
+
+document.getElementById("confirmApproveBtn").addEventListener("click", async () => {
+  if (!currentStudentId) return;
+
+  const selectedGroup = document.getElementById("modalGroupSelect").value;
+  await updateDoc(doc(db, "students", currentStudentId), {
+    active: true,
+    approved: true,
+    group: selectedGroup
+  });
+
+  closeModal();
+  alert("Student Approved Successfully!");
+  loadPendingStudents();
+});
+
+window.disapproveStudent = async function(id) {
+  if (confirm("Are you sure you want to reject and remove this request?")) {
+    await deleteDoc(doc(db, "students", id));
+    loadPendingStudents();
+  }
+};
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+loadPendingStudents();
+</script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMR SAKR | Teacher Grades</title>
+  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png" type="image/png">
+  <style>
+    body {
+      padding-top: 82px;
+    }
+
+    .hero-wrap {
+      width: min(100%, 1120px);
+    }
+
+    .hero-card.hero-split {
+      text-align: left;
+      padding: 20px;
+    }
+
+    .teacher-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .teacher-box {
+      background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 16px 35px rgba(0,0,0,0.24);
+    }
+
+    .teacher-box h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .student-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .student-chip {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .student-chip.active,
+    .student-chip:hover {
+      background: rgba(255,230,117,0.18);
+      transform: translateY(-1px);
+    }
+
+    .student-chip strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .student-chip span {
+      font-size: 12px;
+      color: rgba(255,255,255,0.74);
+    }
+
+    .selected-card {
+      background: rgba(255,230,117,0.12);
+      border: 1px solid rgba(255,230,117,0.22);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+
+    .teacher-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .teacher-form input,
+    .teacher-form button {
+      font: inherit;
+    }
+
+    .teacher-form input {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      padding: 0 12px;
+      box-sizing: border-box;
+    }
+
+    .teacher-form input::placeholder {
+      color: rgba(255,255,255,0.68);
+    }
+
+    .teacher-form button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff7c5 0%, #ffd700 45%, #ffbb00 100%);
+      color: rgb(0, 0, 103);
+    }
+
+    .grade-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .grade-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .grade-item strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .grade-item span {
+      color: rgba(255,255,255,0.75);
+      font-size: 13px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* الأزرار والتنسيقات الجديدة للوضع المتتالي */
+    .upload-btn {
+      width: 100%;
+      border: 1px dashed #ffd700;
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 215, 0, 0.08);
+      color: #ffd700;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .upload-btn:hover {
+      background: rgba(255, 215, 0, 0.18);
+    }
+
+    .wizard-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .wizard-card {
+      background: #11143a;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      width: min(100%, 450px);
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .wizard-card h3 {
+      margin-top: 0;
+      color: #ffd700;
+    }
+    .wizard-step {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .wizard-step.active {
+      display: flex;
+    }
+    .wizard-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .wizard-buttons button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-cancel {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    .btn-next {
+      background: linear-gradient(135deg, #fff7c5 0%, #ffd700 45%, #ffbb00 100%);
+      color: rgb(0, 0, 103);
+    }
+
+    .teacher-form select {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      padding: 0 12px;
+      box-sizing: border-box;
+      font: inherit;
+    }
+
+    .teacher-form select option {
+      background: rgb(0, 0, 103);
+      color: #fff;
+    }
+
+    #middleSelector {
+      display: none;
+    }
+
+    #middleSelector.show {
+      display: block;
+    }
+
+    @media (max-width: 850px) {
+      body {
+        padding-top: 76px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+  <div class="upbox">
+    &nbsp;&nbsp;&nbsp;&nbsp;<div class="hh"><img src="logo.png" width="70px" alt="Logo"></div>
+    <span class="brand-name">AMR SAKR</span>
+    <div class="upboxs">
+      <button id="menuBtn" class="menu-btn" type="button" aria-label="Open menu">
+        <img src="menu.png" width="60px" alt="Menu">
+      </button>
+    </div>
+  </div>
+
+  <main class="hero-wrap">
+    <section class="hero-card hero-split">
+      <article class="hero-visual">
+        <p class="eyebrow">TEACHER PANEL</p>
+        <img src="logo.png" width="300px" id="mlogo" alt="AMR SAKR logo">
+        <h1 class="hero-title">Exam Grades</h1>
+        <p class="hero-text">Choose a student, enter their score and the total exam grade, then save.</p>
+      </article><br>
+
+      <aside class="hero-actions">
+        <div class="teacher-panel">
+          <div class="teacher-box">
+            <h3>Students</h3>
+            <div id="studentsList" class="student-list"></div>
+            <!-- الزرار الجديد المضاف تحت قائمة الطلاب -->
+            <button type="button" class="upload-btn" id="openWizardBtn">Upload New Exam Grades</button>
+          </div>
+
+          <div class="teacher-box">
+            <div id="selectedCard" class="selected-card">Select a student</div>
+            <form id="gradeForm" class="teacher-form">
+              <input id="examNumber" type="number" min="1" placeholder="Exam number" required>
+              <input id="subject" type="text" placeholder="Subject" required>
+              <div class="form-row">
+                <input id="grade" type="number" step="0.5" placeholder="Student Grade" style="width:50%" required>
+                <input id="totalGrade" type="number" step="0.5" placeholder="Total Grade" style="width:50%" required>
+              </div>
+              <button type="submit">Save Grade</button>
+            </form>
+            <div id="gradesList" class="grade-list"></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- واجهة إضافة الدرجات المتتالية (Wizard Modal) -->
+  <div id="wizardOverlay" class="wizard-overlay">
+    <div class="wizard-card">
+      <h3 id="wizardTitle">New Exam Setup</h3>
+      
+      <!-- الخطوة الأولى: إدخال بيانات الامتحان -->
+      <div id="stepSetup" class="wizard-step active teacher-form">
+        <input id="wizExamNumber" type="number" min="1" placeholder="Exam number" required>
+        <input id="wizSubject" type="text" placeholder="Subject" required>
+        <input id="wizTotalGrade" type="number" step="0.5" placeholder="Total Grade" required>
+        <select id="groupSelector" required>
+          <option value="">Select group...</option>
+        </select>
+        <select id="middleSelector">
+          <option value="">Select year level...</option>
+          <option value="1">Year 1</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+        </select>
+        <div class="wizard-buttons">
+          <button type="button" class="btn-cancel" id="closeWizardBtn">Cancel</button>
+          <button type="button" class="btn-next" id="startGradesBtn">Start Entering Grades</button>
+        </div>
+      </div>
+
+      <!-- الخطوة الثانية: إدخال درجات الطلاب واحداً تلو الآخر -->
+      <div id="stepStudentGrade" class="wizard-step teacher-form">
+        <div id="wizStudentInfo" style="color: #fff; font-size: 18px; margin-bottom: 5px;"></div>
+        <input id="wizStudentScore" type="number" step="0.5" placeholder="Student Grade" required>
+        <div style="color: rgba(255,255,255,0.6); font-size: 13px;" id="wizProgress"></div>
+        <div class="wizard-buttons">
+          <button type="button" class="btn-cancel" id="skipStudentBtn">Skip Student</button>
+          <button type="button" class="btn-next" id="nextStudentBtn">Next Student</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      setDoc,
+      deleteDoc,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAC1bNuWAD8noagHV2SD0y4PP0ABhxDdqo",
+      authDomain: "students-68430.firebaseapp.com",
+      projectId: "students-68430",
+      storageBucket: "students-68430.firebasestorage.app",
+      messagingSenderId: "202641775624",
+      appId: "1:202641775624:web:fe2d70e4ec92d62d5b85bd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let allStudents = []; // لتخزين كل الطلاب للـ Wizard
+    let allStudentsUnfiltered = []; // لتخزين كل الطلاب بدون تصفية
+    let allGroups = []; // لتخزين كل المجموعات
+    let selectedStudent = null;
+    let wizardCurrentIndex = 0;
+    let wizardExamData = {};
+    let wizardSelectedGroup = ""; // المجموعة المختارة في الـ Wizard
+    let wizardSelectedMiddle = ""; // السنة المختارة في الـ Wizard
+
+    const studentsList = document.getElementById("studentsList");
+    const selectedCard = document.getElementById("selectedCard");
+    const gradesList = document.getElementById("gradesList");
+    const gradeForm = document.getElementById("gradeForm");
+
+    // عناصر الـ Wizard
+    const wizardOverlay = document.getElementById("wizardOverlay");
+    const openWizardBtn = document.getElementById("openWizardBtn");
+    const closeWizardBtn = document.getElementById("closeWizardBtn");
+    const startGradesBtn = document.getElementById("startGradesBtn");
+    const nextStudentBtn = document.getElementById("nextStudentBtn");
+    const skipStudentBtn = document.getElementById("skipStudentBtn");
+    const groupSelector = document.getElementById("groupSelector");
+    const middleSelector = document.getElementById("middleSelector");
+    
+    const stepSetup = document.getElementById("stepSetup");
+    const stepStudentGrade = document.getElementById("stepStudentGrade");
+    const wizardTitle = document.getElementById("wizardTitle");
+    const wizStudentInfo = document.getElementById("wizStudentInfo");
+    const wizStudentScore = document.getElementById("wizStudentScore");
+    const wizProgress = document.getElementById("wizProgress");
+
+    async function loadStudents() {
+      const snapshot = await getDocs(collection(db, "students"));
+      allStudentsUnfiltered = snapshot.docs
+        .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      allStudents = allStudentsUnfiltered;
+
+      studentsList.innerHTML = "";
+
+      if (!allStudents.length) {
+        studentsList.innerHTML = "<p style='margin:0;color:rgba(255,255,255,0.75);'>No students found.</p>";
+        return;
+      }
+
+      allStudents.forEach((student) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "student-chip";
+        if (selectedStudent && selectedStudent.id === student.id) {
+          btn.classList.add("active");
+        }
+        btn.innerHTML = `
+          <strong>${student.name || "Unnamed student"}</strong>
+          <span>ID: ${student.id}</span>
+        `;
+        btn.addEventListener("click", () => selectStudent(student));
+        studentsList.appendChild(btn);
+      });
+
+      if (!selectedStudent && allStudents.length) {
+        selectStudent(allStudents[0]);
+      }
+    }
+
+    async function loadGroups() {
+      const snapshot = await getDocs(collection(db, "groups"));
+      allGroups = snapshot.docs
+        .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+        .filter(g => g.active !== false)
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+      groupSelector.innerHTML = '<option value="">Start for all groups</option>';
+      allGroups.forEach((group) => {
+        const option = document.createElement("option");
+        option.value = group.id;
+        option.textContent = group.name || "Unnamed Group";
+        groupSelector.appendChild(option);
+      });
+    }
+
+    async function selectStudent(student) {
+      selectedStudent = student;
+      selectedCard.innerHTML = `
+        <strong>${student.name || "Unnamed student"}</strong>
+        <div style="margin-top:3px;color:rgba(255,255,255,0.82);">ID: ${student.id}</div>
+        <div style="margin-top:2px;color:rgba(255,255,255,0.82);">Phone: ${student.phone || "-"}</div>
+      `;
+      await loadGrades();
+      
+      // تحديث فئة الـ active في القائمة الجانبية بدون إعادة البناء بالكامل للحفاظ على الأداء
+      const chips = studentsList.querySelectorAll('.student-chip');
+      chips.forEach((chip, index) => {
+        if(allStudents[index] && allStudents[index].id === student.id) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+
+    async function loadGrades() {
+      if (!selectedStudent) {
+        gradesList.innerHTML = "";
+        return;
+      }
+
+      const q = query(collection(db, "grades"), where("studentId", "==", selectedStudent.id));
+      const snapshot = await getDocs(q);
+      const grades = snapshot.docs
+        .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+        .sort((a, b) => Number(a.examNumber || 0) - Number(b.examNumber || 0));
+
+      gradesList.innerHTML = "";
+      if (!grades.length) {
+        gradesList.innerHTML = "<p style='margin:8px 0 0;color:rgba(255,255,255,0.72);'>No grades saved yet.</p>";
+        return;
+      }
+
+      grades.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "grade-item";
+        row.innerHTML = `
+          <div>
+            <strong>Exam ${item.examNumber || "-"}</strong>
+            <span>Subject: ${item.subject || "-"}</span><br>
+            <span>Score: ${item.grade || "0"} / ${item.totalGrade || "100"}</span>
+          </div>
+          <button type="button" style="border:none;border-radius:10px;padding:8px 10px;cursor:pointer;background:rgba(255,77,77,0.18);color:#ff8d8d;" onclick="deleteGrade('${item.id}')">Delete</button>
+        `;
+        gradesList.appendChild(row);
+      });
+    }
+
+    // إضافة درجة لطالب منفرد (الطريقة القديمة)
+    gradeForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!selectedStudent) {
+        alert("Select a student first.");
+        return;
+      }
+
+      const examNumber = document.getElementById("examNumber").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const grade = document.getElementById("grade").value.trim();
+      const totalGrade = document.getElementById("totalGrade").value.trim();
+
+      if (!examNumber || !subject || !grade || !totalGrade) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const gradeId = `${selectedStudent.id}_${Date.now()}`;
+      await setDoc(doc(db, "grades", gradeId), {
+        studentId: selectedStudent.id,
+        studentName: selectedStudent.name || "",
+        examNumber,
+        subject,
+        grade,
+        totalGrade,
+        createdAt: new Date().toISOString()
+      });
+
+      gradeForm.reset();
+      await loadGrades();
+    });
+
+    window.deleteGrade = async function (id) {
+      if (!confirm("Delete this grade entry?")) return;
+      await deleteDoc(doc(db, "grades", id));
+      await loadGrades();
+    };
+
+    // ==========================================
+    // منطق الإدخال المتتالي والـ Wizard الجديد
+    // ==========================================
+    
+    openWizardBtn.addEventListener("click", async () => {
+      if (!allStudents.length) {
+        alert("No students available to add grades.");
+        return;
+      }
+      await loadGroups();
+      wizardOverlay.style.display = "flex";
+      stepSetup.classList.add("active");
+      stepStudentGrade.classList.remove("active");
+      wizardTitle.innerText = "New Exam Setup";
+      groupSelector.value = "";
+      middleSelector.value = "";
+      middleSelector.classList.remove("show");
+      
+      document.getElementById("wizExamNumber").value = "";
+      document.getElementById("wizSubject").value = "";
+      document.getElementById("wizTotalGrade").value = "";
+    });
+
+    groupSelector.addEventListener("change", (e) => {
+      if (e.target.value === "") {
+        middleSelector.classList.add("show");
+      } else {
+        middleSelector.classList.remove("show");
+        middleSelector.value = "";
+      }
+    });
+
+    closeWizardBtn.addEventListener("click", () => {
+      wizardOverlay.style.display = "none";
+    });
+
+    startGradesBtn.addEventListener("click", () => {
+      const examNumber = document.getElementById("wizExamNumber").value.trim();
+      const subject = document.getElementById("wizSubject").value.trim();
+      const totalGrade = document.getElementById("wizTotalGrade").value.trim();
+      const selectedGroup = groupSelector.value;
+      const selectedMiddle = middleSelector.value;
+
+      if (!examNumber || !subject || !totalGrade) {
+        alert("Please fill in all exam setup fields.");
+        return;
+      }
+
+      wizardSelectedGroup = selectedGroup;
+      wizardSelectedMiddle = selectedMiddle;
+
+      if (selectedGroup) {
+        allStudents = allStudentsUnfiltered.filter(s => (s.group || "").toString() === selectedGroup);
+      } else if (selectedMiddle) {
+        allStudents = allStudentsUnfiltered.filter(s => (s.middle || 1).toString() === selectedMiddle);
+      }
+      // else: no filters applied, use all students
+
+      if (!allStudents.length) {
+        alert("No students found for the selected criteria.");
+        return;
+      }
+
+      wizardExamData = { examNumber, subject, totalGrade };
+      wizardCurrentIndex = 0;
+
+      stepSetup.classList.remove("active");
+      stepStudentGrade.classList.add("active");
+      showWizardStudent();
+    });
+
+    function showWizardStudent() {
+      if (wizardCurrentIndex >= allStudents.length) {
+        alert("All student grades processed successfully!");
+        wizardOverlay.style.display = "none";
+        loadGrades(); 
+        return;
+      }
+
+      const currentStudent = allStudents[wizardCurrentIndex];
+      wizardTitle.innerText = `Entering Grades: Exam ${wizardExamData.examNumber}`;
+      wizStudentInfo.innerHTML = `Student: <strong>${currentStudent.name || "Unnamed"}</strong><br><span style='font-size:14px;color:rgba(255,255,255,0.6)'>ID: ${currentStudent.id}</span>`;
+      wizStudentScore.value = "";
+      wizStudentScore.focus();
+      wizProgress.innerText = `Student ${wizardCurrentIndex + 1} of ${allStudents.length}`;
+    }
+
+    async function saveWizardGrade() {
+      const score = wizStudentScore.value.trim();
+      if (!score) {
+        alert("Please enter a score or skip this student.");
+        return false;
+      }
+
+      const currentStudent = allStudents[wizardCurrentIndex];
+      const gradeId = `${currentStudent.id}_${Date.now()}`;
+
+      await setDoc(doc(db, "grades", gradeId), {
+        studentId: currentStudent.id,
+        studentName: currentStudent.name || "",
+        examNumber: wizardExamData.examNumber,
+        subject: wizardExamData.subject,
+        grade: score,
+        totalGrade: wizardExamData.totalGrade,
+        createdAt: new Date().toISOString()
+      });
+
+      return true;
+    }
+
+    nextStudentBtn.addEventListener("click", async () => {
+      const saved = await saveWizardGrade();
+      if (saved) {
+        wizardCurrentIndex++;
+        showWizardStudent();
+      }
+    });
+
+    skipStudentBtn.addEventListener("click", () => {
+      wizardCurrentIndex++;
+      showWizardStudent();
+    });
+
+    // تشغيل جلب الطلاب عند فتح الصفحة أول مرة
+    loadStudents();
+  </script>
+</body>
+</html>

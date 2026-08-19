@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Panel</title>
+  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.png" type="image/png">
+  <style>
+    .upload-shell { width: min(100%, 1100px); margin: 0 auto; padding: 18px 14px 44px; box-sizing: border-box; }
+    .upload-grid { display: grid; gap: 14px; margin-top: 14px; }
+    .upload-box { background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04)); border: 1px solid rgba(255,255,255,0.14); border-radius: 18px; padding: 14px; box-shadow: 0 18px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.10); }
+    .upload-box h2 { margin: 0 0 10px; font-size: 18px; color: #fff; }
+    .upload-box p { margin: 0 0 12px; color: rgba(255,255,255,0.82); font-size: 14px; }
+    .upload-input { width: 100%; min-height: 48px; border: 1px solid rgba(255,255,255,0.18); border-radius: 14px; background: rgba(255,255,255,0.08); color: #fff; padding: 0 12px; box-sizing: border-box; font: inherit; margin-bottom: 6px; }
+    .upload-input::placeholder { color: rgba(255,255,255,0.65); }
+    .upload-input[type="file"] { padding: 10px 12px; cursor: pointer; }
+    .upload-input[type="file"]::-webkit-file-upload-button,
+    .upload-input[type="file"]::file-selector-button {
+      background: linear-gradient(135deg, #fff7c5 0%, #ffd700 45%, #ffbb00 100%);
+      color: #00104a;
+      border: 1px solid rgba(255,255,255,0.45);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      margin-right: 10px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+    }
+    .upload-file-wrap { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+    .upload-file-note { color: rgba(255,255,255,0.78); font-size: 12px; line-height: 1.3; margin-bottom: 6px; }
+    .upload-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .upload-actions .btn { max-width: 240px; min-height: 50px; font-size: 18px; border-radius: 14px; }
+    .upload-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 18px; }
+    
+    .upload-card { 
+      position: relative; 
+      background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04)); 
+      border: 1px solid rgba(255,255,255,0.14); 
+      border-radius: 18px; 
+      padding: 12px; 
+      box-shadow: 0 16px 30px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.10); 
+      user-select: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    .upload-card img { width: 100%; height: auto; object-fit: contain; border-radius: 12px; display: block; }
+    .upload-card h3 { margin: 10px 0 6px; color: #fff; font-size: 17px; }
+    .upload-card .btn { min-height: 42px; font-size: 15px; border-radius: 12px; margin-top: 8px; }
+    .doc-icon { width: 100%; height: 150px; border-radius: 12px; display: grid; place-items: center; background: rgba(255,255,255,0.08); font-size: 56px; }
+
+    .checkbox-container {
+      display: none; 
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 10;
+    }
+    .custom-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 26px;
+      height: 26px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%; 
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(5px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .custom-checkbox:hover {
+      border-color: #ffd700;
+      transform: scale(1.05);
+    }
+    .custom-checkbox:checked {
+      background: linear-gradient(135deg, #ffd700, #ffbb00);
+      border-color: #ffd700;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    }
+    .custom-checkbox:checked::after {
+      content: '';
+      width: 6px;
+      height: 11px;
+      border: solid #00104a;
+      border-width: 0 2.5px 2.5px 0;
+      transform: rotate(45deg);
+      margin-bottom: 2px;
+    }
+    .upload-card.selected-glow {
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 16px 30px rgba(255, 215, 0, 0.1), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .delete-all-container {
+      display: none;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .btn-danger-mass {
+      background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 77, 77, 0.25);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .btn-danger-mass:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 77, 77, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+  <div class="upbox">
+    &nbsp;&nbsp;&nbsp;&nbsp;<div class="hh"><img src="logo.png" width="70px" alt="Logo"></div>
+    <span class="brand-name">AMR SAKR</span>
+    <div class="upboxs">
+      <button id="menuBtn" class="menu-btn" type="button" aria-label="Open menu">
+        <img src="menu.png" width="60px" alt="Menu">
+      </button>
+    </div>
+  </div>
+
+  <aside id="sideMenu" class="side-menu" aria-label="Main menu">
+    <button id="closeMenu" class="close-menu" type="button" aria-label="Close menu">×</button>
+    <h2>AMR SAKR</h2>
+<a href="../index.html">HOME</a>
+    <a href="../code.html">SIGN IN</a>
+    <a href="../channel.html">STUDENT PAGE</a>
+    <a href="../loading2.html">LOADING</a>
+    <a href="#" onclick="localStorage.removeItem('savedCode'); window.location.href='../index.html';">SIGN OUT</a>
+  </aside>
+
+  <main class="hero-wrap upload-shell">
+    <section class="hero-card">
+      <p class="eyebrow">ADMIN TOOLS</p>
+      <img src="logo.png" width="350px" id="mlogo" alt="AMR SAKR logo">
+      <h1 class="hero-title">Upload Panel</h1>
+      <p class="hero-text">Add 3 TEXT inputs only for one type then click Upload</p>
+
+      <div class="upload-grid">
+        <div class="upload-box">
+          <h2>Target group</h2>
+          <p>Select group for this uploaded content</p>
+          <select id="targetGroup" class="upload-input">
+            <option value="">All groups / same middle</option>
+          </select>
+        </div>
+
+        <div class="upload-box">
+          <h2>Lesson / Video</h2>
+          <p>Upload a lesson</p>
+          <input id="name" class="upload-input" placeholder="Lesson name">
+          <input id="link" class="upload-input" placeholder="Video link">
+          <div class="upload-file-wrap">
+            <input id="imageUrl" class="upload-input" placeholder="paste image URL link...">
+            <small class="upload-file-note" style="text-align: center; display: block;">— OR —</small>
+            <input id="imageFile" class="upload-input" type="file" accept="image/*" aria-label="Upload lesson image from device">
+            <small id="imageFileNote" class="upload-file-note">Choose an image from your device for the lesson card.</small>
+          </div>
+        </div>
+
+        <div class="upload-box">
+          <h2>Document</h2>
+          <p>Add document link.</p>
+          <input id="namee" class="upload-input" placeholder="Document name">
+          <input id="linke" class="upload-input" placeholder="Document link">
+        </div>
+
+        <div class="upload-box">
+          <h2>Live Session</h2>
+          <p>Upload a live session</p>
+          <input id="liveName" class="upload-input" placeholder="Live session name">
+          <input id="liveLink" class="upload-input" placeholder="Live session link">
+          <div class="upload-file-wrap">
+            <input id="liveImageUrl" class="upload-input" placeholder="Or paste image URL link...">
+            <small class="upload-file-note" style="text-align: center; display: block;">— OR —</small>
+            <input id="liveImageFile" class="upload-input" type="file" accept="image/*" aria-label="Upload live session image from device">
+            <small id="liveImageFileNote" class="upload-file-note">Choose an image from your device for the live session card.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-actions">
+        <button id="uploadBtn" class="btn" type="button">Upload</button>
+      </div>
+      <p id="uploadStatus" class="upload-file-note" style="margin-top:8px; min-height: 1.2em; color: #fff;">Choose your data and click Upload.</p>
+
+      <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0 14px;">
+
+      <div id="massDeleteBar" class="delete-all-container">
+        <button id="massDeleteBtn" class="btn-danger-mass" type="button">Delete Selected Cards</button>
+      </div>
+
+      <div class="upload-list" id="container"></div>
+    </section>
+  </main>
+
+  <script>
+    function updateFileNote(input, note) {
+      if (!input || !note) return;
+      const fileName = input.files && input.files[0] ? input.files[0].name : 'No file chosen';
+      note.textContent = fileName === 'No file chosen'
+        ? 'Choose an image from your device for this card.'
+        : `Selected: ${fileName}`;
+    }
+
+    const imageFileInput = document.getElementById('imageFile');
+    const imageFileNote = document.getElementById('imageFileNote');
+    const liveImageFileInput = document.getElementById('liveImageFile');
+    const liveImageFileNote = document.getElementById('liveImageFileNote');
+
+    if (imageFileInput && imageFileNote) {
+      imageFileInput.addEventListener('change', () => updateFileNote(imageFileInput, imageFileNote));
+      updateFileNote(imageFileInput, imageFileNote);
+    }
+
+    if (liveImageFileInput && liveImageFileNote) {
+      liveImageFileInput.addEventListener('change', () => updateFileNote(liveImageFileInput, liveImageFileNote));
+      updateFileNote(liveImageFileInput, liveImageFileNote);
+    }
+
+    const menuBtn = document.getElementById('menuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    const closeMenu = document.getElementById('closeMenu');
+
+    function openMenu() {
+      sideMenu.classList.add('open');
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenuPanel() {
+      sideMenu.classList.remove('open');
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    if (menuBtn) menuBtn.addEventListener('click', openMenu);
+    if (closeMenu) closeMenu.addEventListener('click', closeMenuPanel);
+    if (overlay) overlay.addEventListener('click', closeMenuPanel);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeMenuPanel();
+    });
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD7pq3JOf-wJ4JW-bW0A43wUUDTeXFUEyE",
+      authDomain: "course1-b69a8.firebaseapp.com",
+      projectId: "course1-b69a8",
+      storageBucket: "course1-b69a8.firebasestorage.app",
+      messagingSenderId: "227683851137",
+      appId: "1:227683851137:web:6a93710794e0ac3598a680"
+    };
+
+    const studentFirebaseConfig = {
+      apiKey: "AIzaSyCEFLxdWt8h1_JWjzyJ2n2dP-HXxmD3jvU",
+      authDomain: "students-68430.firebaseapp.com",
+      projectId: "students-68430",
+      storageBucket: "students-68430.firebasestorage.app",
+      messagingSenderId: "202641775624",
+      appId: "1:202641775624:web:fe2d70e4ec92d62d5b85bd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsApp = initializeApp(studentFirebaseConfig, "students-shared");
+    const dbStudents = getFirestore(studentsApp);
+    const pageMiddle = 1;
+
+    async function loadGroups() {
+      const targetGroup = document.getElementById("targetGroup");
+      if (!targetGroup) return;
+      const snapshot = await getDocs(collection(dbStudents, "groups"));
+      const groups = [];
+      snapshot.forEach((groupDoc) => {
+        const data = groupDoc.data();
+        if (data.active !== false) {
+          groups.push({ id: groupDoc.id, name: data.name || 'Unnamed Group' });
+        }
+      });
+      groups.sort((a, b) => a.name.localeCompare(b.name));
+      targetGroup.innerHTML = '<option value="">All groups / same middle</option>';
+      groups.forEach((group) => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = group.name;
+        targetGroup.appendChild(option);
+      });
+    }
+
+    const container = document.getElementById("container");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const uploadStatus = document.getElementById("uploadStatus");
+    const massDeleteBar = document.getElementById("massDeleteBar");
+    const massDeleteBtn = document.getElementById("massDeleteBtn");
+
+    function setStatus(message, isError = false) {
+      if (uploadStatus) {
+        uploadStatus.textContent = message;
+        uploadStatus.style.color = isError ? '#ffd9d9' : '#fff';
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    window.upload = async function(){
+      try {
+        if (uploadBtn) uploadBtn.disabled = true;
+        setStatus("Uploading… please wait.");
+
+        // أخذ التوقيت الحالي من جهازك بالملي ثانية بدقة متناهية
+        const deviceTime = Date.now();
+
+        const name = document.getElementById("name").value.trim();
+        const link = document.getElementById("link").value.trim();
+        const imageUrl = document.getElementById("imageUrl").value.trim();
+        const imageFile = document.getElementById("imageFile").files[0];
+
+        const namee = document.getElementById("namee").value.trim();
+        const linke = document.getElementById("linke").value.trim();
+
+        const liveName = document.getElementById("liveName").value.trim();
+        const liveLink = document.getElementById("liveLink").value.trim();
+        const liveImageUrl = document.getElementById("liveImageUrl").value.trim();
+        const liveImageFile = document.getElementById("liveImageFile").files[0];
+
+        const targetGroup = document.getElementById("targetGroup").value || "";
+        const hasLesson = Boolean(name && link);
+        const hasDocument = Boolean(namee && linke);
+        const hasLive = Boolean(liveName && liveLink);
+
+        if (!hasLesson && !hasDocument && !hasLive) {
+          setStatus("Please fill at least one lesson, document, or live session field.", true);
+          return;
+        }
+
+        if(name && link){
+          let image = "";
+          if (imageUrl) {
+            image = imageUrl;
+          } else if (imageFile) {
+            image = await fileToBase64(imageFile);
+          }
+          
+          await addDoc(collection(db,"course1_lessons"),{
+            name:name,
+            link:link,
+            image:image || "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80",
+            group: targetGroup,
+            middle: pageMiddle,
+            createdAt: deviceTime // حفظ التوقيت
+          });
+        }
+
+        if(namee && linke){
+          await addDoc(collection(db,"documents"),{
+            name:namee,
+            link:linke,
+            group: targetGroup,
+            middle: pageMiddle,
+            createdAt: deviceTime // حفظ التوقيت
+          });
+        }
+
+        if(liveName && liveLink){
+          let liveImage = "";
+          if (liveImageUrl) {
+            liveImage = liveImageUrl;
+          } else if (liveImageFile) {
+            liveImage = await fileToBase64(liveImageFile);
+          }
+
+          await addDoc(collection(db,"lives"),{
+            name:liveName,
+            link:liveLink,
+            image:liveImage || "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80",
+            group: targetGroup,
+            middle: pageMiddle,
+            createdAt: deviceTime // حفظ التوقيت
+          });
+
+        }
+
+        document.getElementById("name").value = "";
+        document.getElementById("link").value = "";
+        document.getElementById("imageUrl").value = "";
+        document.getElementById("imageFile").value = "";
+
+        document.getElementById("namee").value = "";
+        document.getElementById("linke").value = "";
+
+        document.getElementById("liveName").value = "";
+        document.getElementById("liveLink").value = "";
+        document.getElementById("liveImageUrl").value = "";
+        document.getElementById("liveImageFile").value = "";
+
+        setStatus("Uploaded successfully 🔥");
+        load();
+      } catch(error) {
+        console.error(error);
+        setStatus(error && error.message ? error.message : 'Upload failed. Try again.', true);
+      } finally {
+        if (uploadBtn) uploadBtn.disabled = false;
+      }
+    }
+
+    async function load(){
+      container.innerHTML = "";
+      massDeleteBar.style.display = "none"; 
+
+      let allItems = [];
+
+      // 1. جلب الدروس
+      const videoSnap = await getDocs(collection(db,"course1_lessons"));
+      videoSnap.forEach(item => {
+        const data = item.data();
+        allItems.push({ id: item.id, type: 'video', time: data.createdAt || 0, html: `
+          <div class="upload-card" data-id="${item.id}" data-type="video">
+            <div class="checkbox-container">
+              <input type="checkbox" class="custom-checkbox">
+            </div>
+            <img src="${data.image || 'https://via.placeholder.com/220x150'}" alt="${data.name || 'Lesson image'}">
+            <h3>${data.name || 'Untitled lesson'}</h3>
+            <a href="${data.link || '#'}" target="_blank" style="text-decoration:none;">
+              <button class="btn" type="button">Open video</button>
+            </a>
+            <button class="btn btn-single-delete" type="button" onclick="deleteVideo('${item.id}')">Delete</button>
+          </div>
+        `});
+      });
+
+      // 2. جلب المستندات
+      const docSnap = await getDocs(collection(db,"documents"));
+      docSnap.forEach(item => {
+        const data = item.data();
+        allItems.push({ id: item.id, type: 'document', time: data.createdAt || 0, html: `
+          <div class="upload-card" data-id="${item.id}" data-type="document">
+            <div class="checkbox-container">
+              <input type="checkbox" class="custom-checkbox">
+            </div>
+            <div class="doc-icon">📄</div>
+            <h3>${data.name || 'Untitled document'}</h3>
+            <a href="${data.link || '#'}" target="_blank" style="text-decoration:none;">
+              <button class="btn" type="button">Open document</button>
+            </a>
+            <button class="btn btn-single-delete" type="button" onclick="deleteDocument('${item.id}')">Delete</button>
+          </div>
+        `});
+      });
+
+      // 3. جلب اللايفات
+      const liveSnap = await getDocs(collection(db,"lives"));
+      liveSnap.forEach(item => {
+        const data = item.data();
+        allItems.push({ id: item.id, type: 'live', time: data.createdAt || 0, html: `
+          <div class="upload-card" data-id="${item.id}" data-type="live">
+            <div class="checkbox-container">
+              <input type="checkbox" class="custom-checkbox">
+            </div>
+            <img src="${data.image || 'https://via.placeholder.com/220x150'}" alt="${data.name || 'Live session'}">
+            <h3>🔴 ${data.name || 'Live session'}</h3>
+            <a href="${data.link}" target="_blank" style="text-decoration:none;">
+              <button class="btn" type="button">Join live</button>
+            </a>
+            <button class="btn btn-single-delete" type="button" onclick="deleteLive('${item.id}')">Delete</button>
+          </div>
+        `});
+      });
+
+      // ترتيب كل الكروت بناءً على وقت رفعها تنازلياً (الأحدث فوق والقديم تحت)
+      allItems.sort((a, b) => b.time - a.time);
+
+      // رندرة الكروت المرتبة داخل الـ Panel
+      allItems.forEach(item => {
+        container.innerHTML += item.html;
+      });
+
+      setupRightClickSelection();
+    }
+
+    function setupRightClickSelection() {
+      const cards = document.querySelectorAll('.upload-card');
+      cards.forEach(card => {
+        card.addEventListener('contextmenu', function(e) {
+          e.preventDefault(); 
+          document.querySelectorAll('.checkbox-container').forEach(el => el.style.display = 'block');
+          massDeleteBar.style.display = 'block';
+          const checkbox = card.querySelector('.custom-checkbox');
+          checkbox.checked = true;
+          card.classList.add('selected-glow');
+        });
+
+        const checkbox = card.querySelector('.custom-checkbox');
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            card.classList.add('selected-glow');
+          } else {
+            card.classList.remove('selected-glow');
+          }
+        });
+      });
+    }
+
+    massDeleteBtn.addEventListener('click', async () => {
+      const selectedBoxes = document.querySelectorAll('.custom-checkbox:checked');
+      if (selectedBoxes.length === 0) {
+        alert("Please select at least one card to delete.");
+        return;
+      }
+
+      if (confirm(`Are you sure you want to delete the ${selectedBoxes.length} selected item(s)?`)) {
+        setStatus("Deleting selected assets...");
+        
+        for (let checkbox of selectedBoxes) {
+          const card = checkbox.closest('.upload-card');
+          const id = card.getAttribute('data-id');
+          const type = card.getAttribute('data-type');
+
+          try {
+            if (type === 'video') {
+              await deleteDoc(doc(db, "course1_lessons", id));
+            } else if (type === 'document') {
+              await deleteDoc(doc(db, "documents", id));
+            } else if (type === 'live') {
+              await deleteDoc(doc(db, "lives", id));
+            }
+          } catch (err) {
+            console.error("Failed to delete asset:", id, err);
+          }
+        }
+
+        setStatus("Selected items deleted successfully! 🔥");
+        load(); 
+      }
+    });
+
+    window.deleteVideo = async function(id){
+      if(confirm("Delete this lesson?")) {
+        await deleteDoc(doc(db,"course1_lessons",id));
+        load();
+      }
+    }
+
+    window.deleteDocument = async function(id){
+      if(confirm("Delete this document?")) {
+        await deleteDoc(doc(db,"documents",id));
+        load();
+      }
+    }
+
+    window.deleteLive = async function(id){
+      if(confirm("Delete this live session?")) {
+        await deleteDoc(doc(db,"lives",id));
+        load();
+      }
+    }
+
+    if (uploadBtn) {
+      uploadBtn.addEventListener('click', () => window.upload());
+    }
+
+    await loadGroups();
+    load();
+  </script>
+</body>
+</html>
