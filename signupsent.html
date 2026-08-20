@@ -263,12 +263,7 @@
   <div id="approveModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">Approve Student</div>
-      <p class="modal-subtext">Select a group for <strong id="modalStudentName" style="color: #a3e5ff;"></strong> before approval:</p>
-      
-      <label style="display:block; font-size:12px; margin-bottom:6px; color:#aaa;">ASSIGN GROUP</label>
-      <select id="modalGroupSelect" class="modal-select">
-        <option value="">No group</option>
-      </select>
+      <p class="modal-subtext">Approve <strong id="modalStudentName" style="color: #a3e5ff;"></strong>?</p>
 
       <div class="modal-actions">
         <button id="confirmApproveBtn" style="background:#4edf7a; color:#000;">Confirm & Approve</button>
@@ -296,26 +291,10 @@ const db = getFirestore(app);
 const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffe675'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-3.8-.85-5.05-2.2.03-1.68 3.37-2.6 5.05-2.6s5.02.92 5.05 2.6C15.8 19.15 14.03 20 12 20z'/></svg>";
 
 let currentStudentId = null;
-let cachedGroups = [];
-
-async function getActiveGroups() {
-  const snapshot = await getDocs(collection(db, "groups"));
-  const groups = [];
-  snapshot.forEach((groupDoc) => {
-    const data = groupDoc.data();
-    if (data.active !== false) {
-      groups.push({ id: groupDoc.id, name: data.name || "Unnamed Group" });
-    }
-  });
-  groups.sort((a, b) => a.name.localeCompare(b.name));
-  return groups;
-}
-
 async function loadPendingStudents() {
   const container = document.getElementById("pendingStudents");
   container.innerHTML = "";
 
-  cachedGroups = await getActiveGroups();
   const querySnapshot = await getDocs(collection(db, "students"));
   let count = 0;
 
@@ -359,10 +338,6 @@ window.openApproveModal = function(id, name) {
   currentStudentId = id;
   document.getElementById("modalStudentName").innerText = name;
   
-  const selectEl = document.getElementById("modalGroupSelect");
-  selectEl.innerHTML = `<option value="">No group</option>` + 
-    cachedGroups.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join("");
-
   document.getElementById("approveModal").classList.add("active");
 };
 
@@ -376,11 +351,9 @@ document.getElementById("cancelModalBtn").addEventListener("click", closeModal);
 document.getElementById("confirmApproveBtn").addEventListener("click", async () => {
   if (!currentStudentId) return;
 
-  const selectedGroup = document.getElementById("modalGroupSelect").value;
   await updateDoc(doc(db, "students", currentStudentId), {
     active: true,
-    approved: true,
-    group: selectedGroup
+    approved: true
   });
 
   closeModal();
