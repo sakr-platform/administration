@@ -602,19 +602,6 @@ function generateCaptchaText() {
   return result;
 }
 
-async function ensureDefaultGroup() {
-  const groupSnapshot = await getDocs(collection(db, "groups"));
-  if (!groupSnapshot.empty) return;
-
-  await setDoc(doc(db, "groups", "default-group"), {
-    id: "default-group",
-    name: "Default Group",
-    middle: 1,
-    active: true,
-    createdAt: Date.now()
-  });
-}
-
 async function loadGroups(selectedMiddle = null) {
   const groups = [];
   const snapshot = await getDocs(collection(db, "groups"));
@@ -1325,7 +1312,6 @@ document.getElementById("searchInput").addEventListener("input", function(){
   loadStudents();
 });
 
-await ensureDefaultGroup();
 await loadGroups(Number(document.getElementById("studentMiddle")?.value || 1));
 loadStudents();
 
